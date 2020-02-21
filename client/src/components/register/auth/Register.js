@@ -27,11 +27,9 @@ export default class Register extends Component {
 			password2: this.state.password2
 		};
 		axios
-			.post("//localhost:5000/api/users/register", newUser)
-			.then(result => {
-				console.log(result.data);
-			});
-		console.log(newUser);
+			.post("/api/users/register", newUser)
+			.then(() => {})
+			.catch(err => this.setState({ errors: err.response.data }));
 	};
 	render() {
 		const { errors } = this.state;
