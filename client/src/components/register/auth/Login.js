@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import TextFieldGroup from "../../common/TextFieldGroup";
 import { connect } from "react-redux";
 import { loginUser } from "../../../actions/authActions";
-import propTypes from "prop-types";
+import { PropTypes } from "prop-types";
 
 class Login extends Component {
 	constructor() {
@@ -25,12 +25,12 @@ class Login extends Component {
 			password: this.state.password
 		};
 		this.props.loginUser(userData);
-    };
-    componentDidMount() {
-        if(this.props.auth.isAuthenticated) {
-            this.props.history.push('/dashboard')
-        }
-    }
+	};
+	componentDidMount() {
+		if (this.props.auth.isAuthenticated) {
+			this.props.history.push("/dashboard");
+		}
+	}
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.auth.isAuthenticated) {
 			this.props.history.push("/dashboard");
@@ -84,7 +84,7 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-	loginUser: propTypes.func.isRequired
+	loginUser: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

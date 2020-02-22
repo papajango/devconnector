@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import TextFieldGroup from "../../common/TextFieldGroup";
 import { connect } from "react-redux";
 import { registerUser } from "../../../actions/authActions";
-import propTypes from "prop-types";
+import { PropTypes } from "prop-types";
 import { withRouter } from "react-router-dom";
 
 class Register extends Component {
@@ -30,12 +30,12 @@ class Register extends Component {
 			password2: this.state.password2
 		};
 		this.props.registerUser(newUser, this.props.history);
-    };
-    componentDidMount() {
-        if(this.props.auth.isAuthenticated) {
-            this.props.history.push('/dashboard')
-        }
-    }
+	};
+	componentDidMount() {
+		if (this.props.auth.isAuthenticated) {
+			this.props.history.push("/dashboard");
+		}
+	}
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.errors) {
 			this.setState({
@@ -102,9 +102,9 @@ class Register extends Component {
 }
 
 Register.propTypes = {
-	registerUser: propTypes.func.isRequired,
-	auth: propTypes.object.isRequired,
-	errors: propTypes.object.isRequired
+	registerUser: PropTypes.func.isRequired,
+	auth: PropTypes.object.isRequired,
+	errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

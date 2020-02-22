@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
-import propTypes from "prop-types";
+import { PropTypes } from "prop-types";
 import { logoutUser } from "../../actions/authActions";
 import { clearCurrentProfile } from "../../actions/profileActions";
 
@@ -30,6 +30,11 @@ class Navbar extends Component {
 							/>
 							Logout
 						</a>
+					</li>
+					<li className="nav-item">
+						<Link to="/dashboard" className="nav-link">
+							Dashboard
+						</Link>
 					</li>
 				</ul>
 			</div>
@@ -72,8 +77,8 @@ class Navbar extends Component {
 }
 
 Navbar.propTypes = {
-	logoutUser: propTypes.func.isRequired,
-	auth: propTypes.object.isRequired
+	logoutUser: PropTypes.func.isRequired,
+	auth: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
