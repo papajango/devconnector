@@ -71,3 +71,29 @@ export const deleteAccount = () => dispatch => {
 			);
 	}
 };
+
+// add experience
+export const addExperience = (newExperience, history) => dispatch => {
+	axios
+		.post("/api/profile/experience", newExperience)
+		.then(res => history.push("/dashboard"))
+		.catch(err =>
+			dispatch({
+				type: GET_ERRORS,
+				payload: err.response.data
+			})
+		);
+};
+
+// add experience
+export const addEducation = (newEducation, history) => dispatch => {
+	axios
+		.post("/api/profile/education", newEducation)
+		.then(res => history.push("/dashboard"))
+		.catch(err =>
+			dispatch({
+				type: GET_ERRORS,
+				payload: err.response.data
+			})
+		);
+};

@@ -184,7 +184,7 @@ router.post(
 				current: req.body.current,
 				description: req.body.description
 			};
-			console.log("newExp", newExp);
+			//console.log("newExp", newExp);
 			// add to experience array
 			profile.experience.unshift(newExp);
 			profile.save().then(profile => {

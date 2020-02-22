@@ -17,6 +17,7 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import CreateProfile from "./components/create-profile/CreateProfile";
 import EditProfile from "./components/edit-profile/EditProfile";
 import AddExperience from "./components/add-credentials/AddExperience";
+import AddEducation from "./components/add-credentials/AddEducation";
 
 // check for token
 if (localStorage.jwtToken) {
@@ -73,6 +74,13 @@ const App = () => {
 								path="/add-experience"
 								exact
 								component={AddExperience}
+							/>
+						</Switch>
+						<Switch>
+							<PrivateRoute
+								path="/add-education"
+								exact
+								component={AddEducation}
 							/>
 						</Switch>
 					</div>
