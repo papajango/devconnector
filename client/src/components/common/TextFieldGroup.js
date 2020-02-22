@@ -1,12 +1,11 @@
 import React from "react";
 import classnames from "classnames";
-import {PropTypes} from 'prop-types';
+import { PropTypes } from "prop-types";
 
 const TextFieldGroup = ({
 	name,
 	placeholder,
 	value,
-	label,
 	error,
 	info,
 	type,
@@ -30,7 +29,7 @@ const TextFieldGroup = ({
 	</div>
 );
 
-TextFieldGroup.propTypes ={
+TextFieldGroup.propTypes = {
 	name: PropTypes.string.isRequired
-}
+};
 export default TextFieldGroup;
