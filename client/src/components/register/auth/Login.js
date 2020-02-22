@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import TextFieldGroup from "../../common/TextFieldGroup";
+import { connect } from "react-redux";
+import { loginUser } from "../../../actions/authActions";
+import propTypes from "prop-types";
 
-export default class Login extends Component {
+class Login extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -17,12 +20,27 @@ export default class Login extends Component {
 	};
 	onSubmit = e => {
 		e.preventDefault();
-		const newUser = {
+		const userData = {
 			email: this.state.email,
 			password: this.state.password
 		};
-		console.log(newUser);
-	};
+		this.props.loginUser(userData);
+    };
+    componentDidMount() {
+        if(this.props.auth.isAuthenticated) {
+            this.props.history.push('/dashboard')
+        }
+    }
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.auth.isAuthenticated) {
+			this.props.history.push("/dashboard");
+		}
+		if (nextProps.errors) {
+			this.setState({
+				errors: nextProps.errors
+			});
+		}
+	}
 	render() {
 		const { errors } = this.state;
 		return (
@@ -64,3 +82,13 @@ export default class Login extends Component {
 		);
 	}
 }
+
+Login.propTypes = {
+	loginUser: propTypes.func.isRequired
+};
+
+const mapStateToProps = state => ({
+	auth: state.auth,
+	errors: state.errors
+});
+export default connect(mapStateToProps, { loginUser })(Login);
