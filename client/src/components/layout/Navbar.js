@@ -32,6 +32,11 @@ class Navbar extends Component {
 						</a>
 					</li>
 					<li className="nav-item">
+						<Link to="/feed" className="nav-link">
+							Post Feed
+						</Link>
+					</li>
+					<li className="nav-item">
 						<Link to="/dashboard" className="nav-link">
 							Dashboard
 						</Link>
@@ -69,7 +74,17 @@ class Navbar extends Component {
 					>
 						<span className="navbar-toggler-icon" />
 					</button>
-					{isAuthenticated ? authLinks : guestLinks}
+					<div className="collapse navbar-collapse" id="mobile-nav">
+						<ul className="navbar-nav mr-auto">
+							<li className="nav-item">
+								<Link className="nav-link" to="/profiles">
+									{" "}
+									Developers
+								</Link>
+							</li>
+						</ul>
+						{isAuthenticated ? authLinks : guestLinks}
+					</div>
 				</div>
 			</nav>
 		);
