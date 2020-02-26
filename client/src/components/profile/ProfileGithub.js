@@ -6,8 +6,6 @@ export default class ProfileGithub extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			clientId: "ff05f4cad7009d2ee603",
-			clientSecret: "81378e47f009bed511f5a7889be597c684c8557d",
 			count: 5,
 			sort: "created: asc",
 			repos: []
@@ -18,7 +16,12 @@ export default class ProfileGithub extends Component {
 		const { count, sort, clientId, clientSecret } = this.state;
 		axios
 			.get(
-				`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}&client_id=${clientId}&client_secret=${clientSecret}`
+				`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}`,
+				{
+					headers: {
+						Authorization: `token bf77115d89b4164d4b57f20c46fa0359abaee23d`
+					}
+				}
 			)
 			.then(res => {
 				if (this.refs.myRef) {
@@ -35,13 +38,14 @@ export default class ProfileGithub extends Component {
 				<div className="row">
 					<div className="col-md-6">
 						<h4>
-							<Link
-								to={repo.html_url}
+							<a
+								href={repo.html_url}
 								className="text-info"
 								target="_blank"
+								rel="noopener noreferrer"
 							>
 								{repo.name}
-							</Link>
+							</a>
 						</h4>
 						<p>{repo.description}</p>
 					</div>
