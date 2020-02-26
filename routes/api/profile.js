@@ -31,7 +31,7 @@ router.get(
 					errors.noprofile = "There is no profile for this user";
 					return res.status(404).json(errors);
 				}
-				res.json(profile);
+				return res.json(profile);
 			})
 			.catch(err => res.status(404).json(err));
 	}
@@ -48,9 +48,8 @@ router.get("/all", (req, res) => {
 			if (!profiles) {
 				errors.noprofile = "There are no profiles";
 				return res.status(404).json(errors);
-			} else {
-				res.json(profiles);
 			}
+			return res.json(profiles);
 		})
 		.catch(err => {
 			res.status(404).json({ noprofile: "There are no profiles" });
@@ -67,9 +66,9 @@ router.get("/handle/:handle", (req, res) => {
 		.then(profile => {
 			if (!profile) {
 				errors.noprofile = "There is no profile for this user";
-				res.status(404).json(errors);
+				return res.status(404).json(errors);
 			}
-			res.json(profile);
+			return res.json(profile);
 		})
 		.catch(err => res.status(404).json(err));
 });
@@ -84,9 +83,9 @@ router.get("/user/:user_id", (req, res) => {
 		.then(profile => {
 			if (!profile) {
 				errors.noprofile = "There is no profile for this user";
-				res.status(404).json(errors);
+				return res.status(404).json(errors);
 			}
-			res.json(profile);
+			return res.json(profile);
 		})
 		.catch(err =>
 			res
@@ -132,12 +131,22 @@ router.post(
 			profileFields.social.instagram = req.body.instagram;
 		if (req.body.linkedin)
 			profileFields.social.linkedin = req.body.linkedin;
+		if (req.body.instagram)
+			profileFields.social.instagram = req.body.instagram;
 
 		Profile.findOne({ user: req.user.id }).then(profile => {
 			if (profile) {
 				// update
+				Profile.findOne({ handle: profileFields.handle }).then(p => {
+					if (profile.handle !== p.handle) {
+						errors.handle = "handle already exists";
+						return res.status(400).json(errors);
+					}
+				});
 				Profile.findOneAndUpdate(
-					{ user: req.user.id },
+					{
+						user: req.user.id
+					},
 					{ $set: profileFields },
 					{ new: true }
 				).then(profile => res.json(profile));
@@ -149,7 +158,7 @@ router.post(
 					profile => {
 						if (profile) {
 							errors.handle = "That handle already exists";
-							res.status(400).json(error);
+							return res.status(400).json(error);
 						}
 						// save profile
 						new Profile(profileFields)

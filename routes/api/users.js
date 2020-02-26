@@ -50,9 +50,7 @@ router.post("/register", (req, res) => {
 					newUser.password = hash;
 					newUser
 						.save()
-						.then(user => {
-							res.json(user);
-						})
+						.then(user => res.json(user))
 						.catch(err => console.log(err));
 				});
 			});
@@ -91,7 +89,10 @@ router.post("/login", (req, res) => {
 				};
 				// sign token
 				jwt.sign(payload, secret, { expiresIn: 3600 }, (err, token) => {
-					res.json({ success: true, token: "Bearer " + token });
+					return res.json({
+						success: true,
+						token: "Bearer " + token
+					});
 				});
 			} else {
 				errors.password = "Password incorrect";
@@ -108,7 +109,7 @@ router.get(
 	"/current",
 	passport.authenticate("jwt", { session: false }),
 	(req, res) => {
-		res.json({
+		return res.json({
 			id: req.user.id,
 			name: req.user.name,
 			email: req.user.email

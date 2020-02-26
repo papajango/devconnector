@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 	Post.find()
 		.sort({ date: -1 })
 		.then(posts => {
-			res.json(posts);
+			return res.json(posts);
 		})
 		.catch(err => res.status(404).json(err));
 });
@@ -29,9 +29,17 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
 	Post.findById(req.params.id)
 		.then(post => {
-			res.json(post);
+			if (post) {
+				return res.json(post);
+			} else {
+				return res
+					.status(404)
+					.json({ nopostfound: "No post found with that ID" });
+			}
 		})
-		.catch(err => res.status(404).json(err));
+		.catch(err =>
+			res.status(404).json({ nopostfound: "No post found with that ID" })
+		);
 });
 
 // @route POST api/posts
@@ -51,7 +59,7 @@ router.post(
 			text: req.body.text,
 			name: req.body.name,
 			avatar: req.body.avatar,
-			user: req.body.id
+			user: req.user.id
 		});
 		newPost.save().then(post => res.json(post));
 	}
@@ -67,6 +75,7 @@ router.delete(
 		Profile.findOne({ user: req.user.id }).then(profile => {
 			Post.findById(req.params.id)
 				.then(post => {
+					console.log("post", post);
 					// check for post owner
 					if (post.user.toString() !== req.user.id) {
 						return res
@@ -74,11 +83,12 @@ router.delete(
 							.json({ notauthorized: "User not authorized" });
 					}
 					// delete
-					post.remove().then(() => {
-						res.json({ success: true });
-					});
+					post.remove().then(() => res.json({ success: true }));
 				})
-				.catch(err => res.status(404).json(err));
+				.catch(err => {
+					console.log("err", err);
+					res.status(404).json({ postnotfound: "No post found" });
+				});
 		});
 	}
 );
@@ -104,9 +114,7 @@ router.post(
 					}
 					// add user id to likes array
 					post.likes.unshift({ user: req.user.id });
-					post.save().then(post => {
-						res.json(post);
-					});
+					post.save().then(post => res.json(post));
 				})
 				.catch(err => res.status(404).json(err));
 		});
@@ -155,7 +163,7 @@ router.post(
 	(req, res) => {
 		const { errors, isValid } = validatePostInput(req.body);
 		if (!isValid) {
-			res.status(400).json(errors);
+			return res.status(400).json(errors);
 		}
 		Post.findById(req.params.id)
 			.then(post => {
@@ -167,9 +175,7 @@ router.post(
 				};
 				// add to comments array
 				post.comments.unshift(newComment);
-				post.save().then(post => {
-					res.json(post);
-				});
+				post.save().then(post => res.json(post));
 			})
 			.catch(err => res.status(404).json(err));
 	}
