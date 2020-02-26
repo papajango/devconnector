@@ -13,7 +13,7 @@ export default class ProfileGithub extends Component {
 	}
 	componentDidMount() {
 		const { username } = this.props;
-		const { count, sort, clientId, clientSecret } = this.state;
+		const { count, sort } = this.state;
 		axios
 			.get(
 				`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}`
