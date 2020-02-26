@@ -16,12 +16,7 @@ export default class ProfileGithub extends Component {
 		const { count, sort, clientId, clientSecret } = this.state;
 		axios
 			.get(
-				`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}`,
-				{
-					headers: {
-						Authorization: `token bf77115d89b4164d4b57f20c46fa0359abaee23d`
-					}
-				}
+				`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}`
 			)
 			.then(res => {
 				if (this.refs.myRef) {
