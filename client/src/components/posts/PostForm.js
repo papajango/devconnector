@@ -1,70 +1,45 @@
-import React, { Component } from "react";
-import { addPost } from "../../actions/postActions";
-import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
-import { connect } from "react-redux";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { addPost } from '../../actions/post';
 
-class PostForm extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			text: "",
-			errors: {}
-		};
-	}
-	componentWillReceiveProps(nextProps) {
-		if (nextProps.errors) {
-			this.setState({ errors: nextProps.errors });
-		}
-	}
-	onChange = e => {
-		this.setState({
-			[e.target.name]: e.target.value
-		});
-	};
-	onSubmit = e => {
-		e.preventDefault();
-		const { user } = this.props.auth;
-		const newPost = {
-			text: this.state.text,
-			name: user.name,
-			avatar: user.avatar
-		};
-		this.props.addPost(newPost);
-		this.setState({ text: "" });
-	};
-	render() {
-		const { errors } = this.state;
-		return (
-			<div className="post-form mb-3">
-				<div className="card card-info">
-					<div className="card-header bg-info text-white">
-						Say Something...
-					</div>
-					<div className="card-body">
-						<form onSubmit={this.onSubmit}>
-							<div className="form-group">
-								<TextAreaFieldGroup
-									placeholder="Create a post"
-									name="text"
-									value={this.state.text}
-									onChange={this.onChange}
-									error={errors.text}
-								/>
-							</div>
-							<button type="submit" className="btn btn-dark">
-								Submit
-							</button>
-						</form>
-					</div>
-				</div>
+const PostForm = ({ addPost }) => {
+	const [text, setText] = useState('');
+
+	return (
+		<div className='post-form'>
+			<div className='bg-primary p'>
+				<h3>Say Something...</h3>
 			</div>
-		);
-	}
-}
+			<form
+				className='form my-1'
+				onSubmit={e => {
+					e.preventDefault();
+					addPost({ text });
+					setText('');
+				}}
+			>
+				<textarea
+					name='text'
+					cols='30'
+					rows='5'
+					placeholder='Create a post'
+					value={text}
+					onChange={e => setText(e.target.value)}
+					required
+				/>
+				<input
+					type='submit'
+					className='btn btn-dark my-1'
+					value='Submit'
+				/>
+			</form>
+		</div>
+	);
+};
 
-const mapStateToProps = state => ({
-	auth: state.auth,
-	errors: state.errors
-});
+PostForm.propTypes = {
+	addPost: PropTypes.func.isRequired
+};
 
-export default connect(mapStateToProps, { addPost })(PostForm);
+export default connect(null, { addPost })(PostForm);

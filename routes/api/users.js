@@ -1,119 +1,84 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const gravatar = require("gravatar");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const secret = require("../../config/keys").secretOrKey;
-passport = require("passport");
-
-// load input validation
-const validateRegisterInput = require("../../validation/register");
-const validateLoginInput = require("../../validation/login");
+const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const { check, validationResult } = require('express-validator');
 
 // load user model
-const User = require("../../models/User");
+const User = require('../../models/User');
 
-// @route GET api/users/test
-// @desc Tests users route
-// @access Public
-router.get("/test", (req, res) => res.json({ msg: "Users Works" }));
-
-// @route GET api/users/register
+// @route POST api/users
 // @desc Register user
 // @access Public
-router.post("/register", (req, res) => {
-	const { errors, isValid } = validateRegisterInput(req.body);
+router.post(
+	'/',
+	[
+		check('name', 'Name is required')
+			.not()
+			.isEmpty(),
+		check('email', 'Please include a valid email').isEmail(),
+		check(
+			'password',
+			'Please enter a password with 6 or more characters'
+		).isLength({ min: 6 })
+	],
+	async (req, res) => {
+		const errors = validationResult(req);
 
-	if (!isValid) {
-		return res.status(400).json(errors);
-	}
-
-	User.findOne({ email: req.body.email }).then(user => {
-		if (user) {
-			return res.status(400).json({ email: "Email already exists" });
-		} else {
-			const avatar = gravatar.url(req.body.email, {
-				s: "200", // size
-				r: "pg", // rating
-				d: "mm" // Default
-			});
-			const newUser = new User({
-				name: req.body.name,
-				email: req.body.email,
-				avatar,
-				password: req.body.password
-			});
-
-			bcrypt.genSalt(10, (err, salt) => {
-				bcrypt.hash(newUser.password, salt, (err, hash) => {
-					if (err) throw err;
-					newUser.password = hash;
-					newUser
-						.save()
-						.then(user => res.json(user))
-						.catch(err => console.log(err));
-				});
-			});
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
 		}
-	});
-});
 
-// @route GET api/users/login
-// @desc Login user / Returning jwt token
-// @access Public
-router.post("/login", (req, res) => {
-	const { errors, isValid } = validateLoginInput(req.body);
+		const { name, email, password } = req.body;
 
-	if (!isValid) {
-		return res.status(400).json(errors);
-	}
+		try {
+			let user = await User.findOne({ email });
 
-	const email = req.body.email;
-	const password = req.body.password;
-	// find user by email
-	User.findOne({ email }).then(user => {
-		if (!user) {
-			errors.email = "User not found";
-			return res.status(404).json(errors);
-		}
-		// check password
-		bcrypt.compare(password, user.password).then(isMatch => {
-			if (isMatch) {
-				// user matched
-
-				// create jwt payload
-				const payload = {
-					id: user.id,
-					name: user.name,
-					avatar: user.avatar
-				};
-				// sign token
-				jwt.sign(payload, secret, { expiresIn: 3600 }, (err, token) => {
-					return res.json({
-						success: true,
-						token: "Bearer " + token
-					});
-				});
-			} else {
-				errors.password = "Password incorrect";
-				return res.status(400).json(errors);
+			if (user) {
+				return res
+					.status(400)
+					.json({ errors: [{ msg: 'User already exists' }] });
 			}
-		});
-	});
-});
+			const avatar = gravatar.url(req.body.email, {
+				s: '200', // size
+				r: 'pg', // rating
+				d: 'mm' // Default
+			});
 
-// @route GET api/users/current
-// @desc Return current user
-// @access Private
-router.get(
-	"/current",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		return res.json({
-			id: req.user.id,
-			name: req.user.name,
-			email: req.user.email
-		});
+			user = new User({
+				name,
+				email,
+				avatar,
+				password
+			});
+
+			const salt = await bcrypt.getSalt(10);
+
+			user.password = await bcrypt.hash(password, salt);
+
+			await user.save();
+
+			const payload = {
+				user: {
+					id: user.id
+				}
+			};
+
+			jwt.sign(
+				payload,
+				config.get('jwtSecret'),
+				{ expiresIn: 360000 },
+				(err, token) => {
+					if (err) throw err;
+					res.json({ token });
+				}
+			);
+		} catch (err) {
+			console.error(err.message);
+			res.status(500).send('Server Error');
+		}
 	}
 );
 
